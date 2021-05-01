@@ -7,7 +7,9 @@ import kotlin.math.abs
 private const val TAG = "QuizModelView"
 
 class QuizViewModel : ViewModel() {
+
     public var currentIndex = 0
+    public var isCheater = false
 
     private val questionBank = listOf(
             Question(R.string.question_australia, true),
