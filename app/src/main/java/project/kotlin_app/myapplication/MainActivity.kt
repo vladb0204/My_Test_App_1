@@ -1,8 +1,12 @@
 package project.kotlin_app.myapplication
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.ActivityOptions
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
@@ -13,11 +17,14 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
+import project.kotlin_app.myapplication.CheatActivity.Companion.newIntent
+import project.kotlin_app.myapplication.MainActivity.Companion.newIntent
 import java.lang.NullPointerException
 
 private const val TAG = "MainActivity"
 private const val KEY_INDEX = "index"
 private const val REQUEST_CODE_CHEAT = 0
+private const val EXTRA_ANSWER_IS_TRUE = "project.kotlin_app.myapplication.answer_is_true"
 
 class MainActivity : AppCompatActivity() {
 
@@ -32,6 +39,7 @@ class MainActivity : AppCompatActivity() {
         ViewModelProviders.of(this).get(QuizViewModel::class.java)
     }
 
+    @SuppressLint("RestrictedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "OnCreate(Bundle?) called")
@@ -63,10 +71,15 @@ class MainActivity : AppCompatActivity() {
             updateQuestion()
         }
 
-        cheatButton.setOnClickListener {
+        cheatButton.setOnClickListener { view ->
             val answerIsTrue = quizViewModel.currentQuestionAnswer
             val intent = CheatActivity.newIntent(this@MainActivity, answerIsTrue)
-            startActivityForResult(intent, REQUEST_CODE_CHEAT)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                val options = ActivityOptions.makeClipRevealAnimation(view, 0, 0, view.width, view.height)
+                startActivityForResult(intent, REQUEST_CODE_CHEAT, options.toBundle())
+            } else {
+                startActivityForResult(intent, REQUEST_CODE_CHEAT)
+            }
         }
     }
 
@@ -83,8 +96,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateQuestion() {
-        val questionTextResId = quizViewModel.currentQuestionText
-        questionTextView.setText(questionTextResId)
+        if (quizViewModel.currentIndex == quizViewModel.getQuestionBankSize()) {
+            val intent = ResultActivity.newIntent(this@MainActivity, false)
+            startActivityForResult(intent, 0)
+        } else {
+            val questionTextResId = quizViewModel.currentQuestionText
+            questionTextView.setText(questionTextResId)
+        }
     }
 
     private fun checkAnswer(userAnswer: Boolean) {
@@ -96,6 +114,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
+    }
+
+    companion object {
+        public fun newIntent(packageContext: Context): Intent {
+            return Intent(packageContext, MainActivity::class.java)
+        }
     }
 
     override fun onStart() {

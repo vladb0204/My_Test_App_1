@@ -16,4 +16,8 @@
     <string name="shoew_answer_button">Show answer</string>
     <string name="cheat_button">Cheat!</string>
     <string name="judjement_toast">Cheating is wrong.</string>
+    <string name="move_to_main_activity">Go back</string>
+    <string name="restart_button_text">Restart Game</string>
+    <string name="some">Some</string>
+    <string name="body">Body</string>
 </resources>

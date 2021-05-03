@@ -11,6 +11,8 @@ import android.widget.Button
 import android.widget.TextView
 import java.security.AccessControlContext
 
+public var CHEATING_BOOLEAN = false
+
 private const val EXTRA_ANSWER_IS_TRUE = "project.kotlin_app.myapplication.answer_is_true"
 const val EXTRA_ANSWER_SHOWN = "project.kotlin_app.myapplication.answer_shown"
 
@@ -18,6 +20,7 @@ class CheatActivity : AppCompatActivity() {
 
     private lateinit var answerTextView: TextView
     private lateinit var showAnswerButton: Button
+    private lateinit var mainActivityButton: Button
 
     private var answerIsTrue = false
 
@@ -28,6 +31,7 @@ class CheatActivity : AppCompatActivity() {
         answerIsTrue = intent.getBooleanExtra(EXTRA_ANSWER_IS_TRUE, false)
         answerTextView = findViewById(R.id.answer_text_view)
         showAnswerButton = findViewById(R.id.show_answer_button)
+        mainActivityButton = findViewById(R.id.main_activity_button)
 
         showAnswerButton.setOnClickListener {
             val answerText = when {
@@ -35,6 +39,12 @@ class CheatActivity : AppCompatActivity() {
                 else -> R.string.false_button
             }
             answerTextView.setText(answerText)
+            CHEATING_BOOLEAN = true
+        }
+
+        mainActivityButton.setOnClickListener {
+            val intent = MainActivity.newIntent(this@CheatActivity)
+            startActivityForResult(intent, 0)
         }
     }
 
